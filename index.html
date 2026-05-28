@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>단천부대 행정업무 시스템 - OTP 등록</title>
+    <title>단천부대 행정업무 시스템 - 통합 포탈</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- QR Code Generator Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- EmailJS SDK (실제 이메일 발송 연동용 라이브러리) -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -40,7 +38,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        /* Custom QR Code layout helper */
+        /* QR Code 중앙 정렬 및 배경 스타일 */
         #qrcode img {
             margin: 0 auto;
             border-radius: 8px;
@@ -48,9 +46,10 @@
             background: white;
         }
 
-        /* 대시보드 커스텀 스크롤바 */
+        /* 커스텀 스크롤바 */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
+            height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
             background: rgba(17, 24, 39, 0.5);
@@ -71,73 +70,79 @@
                 <i class="fa-solid fa-shield-halved text-xl"></i>
             </div>
             <div>
-                <h1 class="font-rounded font-bold text-xl tracking-wider text-indigo-400">단천부대 행정업무</h1>
+                <h1 class="font-rounded font-bold text-xl tracking-wider text-indigo-400">단천부대 통합행정포탈</h1>
                 <p class="text-xs text-gray-400 font-rounded">부대 정보 관리 및 보안 시스템</p>
             </div>
         </div>
         <div class="flex items-center space-x-4">
-            <span class="text-sm text-gray-400 font-rounded"><i class="fa-solid fa-lock text-emerald-400 mr-1"></i> 2차 OTP 표준 인증</span>
+            <span id="session-badge" class="text-xs bg-indigo-900/40 text-indigo-300 px-2.5 py-1 rounded-full border border-indigo-800/50 font-rounded">
+                <i class="fa-solid fa-cookie-bite mr-1"></i> 세션 자동 기억 중
+            </span>
         </div>
     </header>
 
     <!-- Main Container -->
     <main class="flex-grow flex items-center justify-center p-4 md:p-8">
-        <div id="main-grid" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 gap-8 transition-all duration-500">
+        
+        <!-- ======================================================= -->
+        <!-- 인증 전 단계 통합 영역 (신규 등록 및 빠른 OTP 잠금해제) -->
+        <!-- ======================================================= -->
+        <div id="auth-container" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 gap-8 transition-all duration-500">
             
             <!-- Left Side: Informational Card -->
-            <div id="info-card" class="md:col-span-5 flex flex-col justify-between p-6 rounded-2xl glass space-y-6 transition-all duration-500">
+            <div class="md:col-span-5 flex flex-col justify-between p-6 rounded-2xl glass space-y-6">
                 <div>
                     <span class="bg-indigo-900/50 text-indigo-300 text-xs px-3 py-1.5 rounded-full font-medium border border-indigo-700/30 font-rounded">
                         <i class="fa-solid fa-key mr-1"></i> Multi-Factor Authentication
                     </span>
-                    <h2 class="font-rounded text-2xl font-bold mt-4 leading-snug text-gray-100">실제 Authenticator<br>2차 인증 등록</h2>
+                    <h2 id="left-title" class="font-rounded text-2xl font-bold mt-4 leading-snug text-gray-100">실제 Authenticator<br>2차 인증 시스템</h2>
                     <p class="text-gray-400 text-sm mt-3 leading-relaxed">
-                        이 시스템은 가상 시뮬레이터가 아닌, 여러분의 스마트폰에 설치된 실제 <strong>Google Authenticator</strong> 또는 <strong>Microsoft Authenticator</strong> 앱과 100% 연동되는 단천부대 행정 포탈입니다.
+                        스마트폰에 설치된 실제 <strong>Google Authenticator</strong> 또는 <strong>Microsoft Authenticator</strong> 앱과 100% 실시간 동기화되는 게임 관리 행정망입니다.
                     </p>
                 </div>
 
                 <div class="space-y-4">
                     <div class="flex items-start space-x-3 text-sm">
-                        <div class="text-indigo-400 mt-1"><i class="fa-solid fa-circle-1"></i></div>
+                        <div class="text-emerald-400 mt-1"><i class="fa-solid fa-square-check"></i></div>
                         <div>
-                            <h4 class="font-semibold text-gray-200 font-rounded">행정 계정 확인</h4>
-                            <p class="text-gray-400 text-xs">부대 행정용 로그인 정보를 입력하고 고유 비밀키를 발급받습니다.</p>
+                            <h4 class="font-semibold text-gray-200 font-rounded">보안 세션 자동 기억</h4>
+                            <p class="text-gray-400 text-xs">한 번 등록하면 계정과 비밀키가 브라우저에 보관되므로 더 이상 번거로운 QR 등록 과정을 매번 거치지 않으셔도 됩니다.</p>
                         </div>
                     </div>
                     <div class="flex items-start space-x-3 text-sm">
                         <div class="text-indigo-400 mt-1"><i class="fa-solid fa-circle-2"></i></div>
                         <div>
-                            <h4 class="font-semibold text-gray-200 font-rounded">QR 코드 스캔 및 등록</h4>
-                            <p class="text-gray-400 text-xs">스마트폰의 OTP 앱으로 화면의 QR 코드를 스캔하여 계정을 등록합니다.</p>
+                            <h4 class="font-semibold text-gray-200 font-rounded">빠른 6자리 로그인</h4>
+                            <p class="text-gray-400 text-xs">재접속 시에는 스마트폰 앱에 나오는 임시 6자리 숫자만 입력하면 즉시 로그인이 해제됩니다.</p>
                         </div>
                     </div>
                     <div class="flex items-start space-x-3 text-sm">
                         <div class="text-indigo-400 mt-1"><i class="fa-solid fa-circle-3"></i></div>
                         <div>
-                            <h4 class="font-semibold text-gray-200 font-rounded">실시간 보안 메일 알림</h4>
-                            <p class="text-gray-400 text-xs">본인 확인 성공 시 등록된 이메일 계정으로 보안 접속 로그가 즉시 자동 발송됩니다.</p>
+                            <h4 class="font-semibold text-gray-200 font-rounded">디스코드 웹훅 알림</h4>
+                            <p class="text-gray-400 text-xs">보안 접속 및 다양한 행정 권한 행사 내역이 연동 채널에 즉시 기록됩니다.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="border-t border-gray-800 pt-4 text-xs text-gray-500 font-rounded">
-                    <i class="fa-solid fa-circle-info mr-1"></i> TOTP (RFC 6238) 표준 보안 규격을 적용하고 있습니다.
+                    <i class="fa-solid fa-circle-info mr-1"></i> TOTP (RFC 6238) 표준 보안 규격을 준수합니다.
                 </div>
             </div>
 
-            <!-- Right Side: Dynamic Interactive Form -->
-            <div id="action-area" class="md:col-span-7 p-6 rounded-2xl glass flex flex-col justify-between min-h-[500px] transition-all duration-500">
+            <!-- Right Side: Dynamic Auth Forms -->
+            <div id="auth-action-card" class="md:col-span-7 p-6 rounded-2xl glass flex flex-col justify-between min-h-[500px]">
                 
-                <!-- STEP 1: Registration Form -->
+                <!-- 1. 계정 정보 최초 등록 폼 (기존 정보가 없을 때만 표시) -->
                 <div id="step-registration" class="space-y-5">
                     <div>
-                        <h3 class="font-rounded text-xl font-bold text-gray-100">Step 1. 행정 계정 정보 입력</h3>
-                        <p class="text-xs text-gray-400 mt-1">행정 권한 활성화를 위한 ID와 비밀번호를 지정해 주세요.</p>
+                        <h3 class="font-rounded text-xl font-bold text-gray-100">Step 1. 행정 계정 정보 등록</h3>
+                        <p class="text-xs text-gray-400 mt-1">포탈 권한을 활성화하기 위한 ID와 비밀번호를 지정하세요.</p>
                     </div>
 
                     <form id="reg-form" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5 font-rounded">행정관 ID (실제 이메일 권장)</label>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5 font-rounded">행정관 ID (실제 이메일 형식 권장)</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"><i class="fa-solid fa-envelope"></i></span>
                                 <input type="email" id="admin-email" required placeholder="member@dancheon.mil" 
@@ -154,202 +159,299 @@
                             </div>
                         </div>
 
-                        <!-- Email Notification Option -->
-                        <div class="bg-indigo-950/20 p-3.5 rounded-xl border border-indigo-900/30 text-xs text-gray-300 space-y-2">
-                            <div class="flex items-start space-x-2.5">
-                                <input type="checkbox" id="email-notify-check" checked class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-600 bg-gray-900 border-gray-800">
-                                <label for="email-notify-check" class="cursor-pointer select-none font-rounded leading-relaxed text-indigo-300">
-                                    [보안 필치] 보안 등급 상승에 따른 실시간 이메일 알림 수신
-                                </label>
-                            </div>
-                            <p class="text-[11px] text-gray-400 pl-6">MFA 등록 완료 및 로그인 성공 시 위 입력하신 메일로 즉시 보안 알림 메일이 자동 전송됩니다.</p>
-                        </div>
-
                         <div class="bg-gray-950/40 p-3.5 rounded-xl border border-gray-800 text-xs text-gray-400 flex items-start space-x-2.5">
                             <input type="checkbox" id="terms-check" required class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-600 bg-gray-900 border-gray-800">
                             <label for="terms-check" class="cursor-pointer select-none leading-relaxed">
-                                본인은 단천부대 행정 보안 서약을 준수하며, 타인에게 OTP 비밀키 및 행정 업무 관련 정보를 절대 공유하지 않을 것에 동의합니다.
+                                본인은 부대 행정 보안 규정을 철저히 지키며, OTP 비밀키와 권한 계정을 타인에게 누설하지 않을 것에 동의합니다.
                             </label>
                         </div>
 
                         <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl transition shadow-lg shadow-indigo-900/30 flex items-center justify-center space-x-2 font-rounded">
-                            <span>보안 비밀키 발급 및 다음 단계</span> <i class="fa-solid fa-arrow-right text-xs"></i>
+                            <span>보안 비밀키 발급 및 등록</span> <i class="fa-solid fa-arrow-right text-xs"></i>
                         </button>
                     </form>
                 </div>
 
-                <!-- STEP 2: Authenticator QR & Secret Key Output -->
+                <!-- 2. 기기 OTP 등록용 QR 표시 폼 (최초 가입 직후에만 노출) -->
                 <div id="step-qr" class="hidden space-y-5">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-rounded text-xl font-bold text-gray-100">Step 2. OTP 앱 등록</h3>
-                            <p class="text-xs text-gray-400 mt-1">스마트폰의 OTP 앱을 열고 아래 QR 코드를 스캔하세요.</p>
+                            <p class="text-xs text-gray-400 mt-1">스마트폰의 OTP 앱을 켠 뒤 아래의 QR 코드를 최초 1회 스캔해 주세요.</p>
                         </div>
-                        <button onclick="goBackToStep1()" class="text-xs text-gray-500 hover:text-gray-300 transition font-rounded"><i class="fa-solid fa-arrow-left mr-1"></i>이전으로</button>
                     </div>
 
-                    <div class="flex flex-col items-center justify-center py-4 bg-gray-950/30 rounded-xl border border-gray-800/80 space-y-4">
+                    <div id="qr-container-wrapper" class="flex flex-col items-center justify-center py-4 bg-gray-950/30 rounded-xl border border-gray-800/80 space-y-4">
                         <!-- QR Code Area -->
                         <div id="qrcode" class="p-2 bg-white rounded-lg shadow-inner"></div>
 
                         <!-- Manual Key Input -->
                         <div class="w-full px-6 space-y-2">
                             <div class="flex justify-between items-center">
-                                <span class="text-xs text-gray-400 font-semibold uppercase tracking-wider font-rounded">수동 입력용 비밀키 (Secret Key)</span>
+                                <span class="text-xs text-gray-400 font-semibold uppercase tracking-wider font-rounded">수동 입력용 비밀키</span>
                                 <span id="copy-status" class="text-xs text-emerald-400 font-rounded">복사 완료!</span>
                             </div>
                             <div class="flex items-center bg-gray-900/80 border border-gray-800 rounded-lg p-2.5 justify-between">
-                                <code id="secret-key-display" class="text-indigo-300 font-mono tracking-wider text-sm select-all">SECRETKEY12345678</code>
+                                <code id="secret-key-display" class="text-indigo-300 font-mono tracking-wider text-sm select-all">SECRETKEY</code>
                                 <button onclick="copySecretKey()" class="text-gray-400 hover:text-white p-1 text-xs transition-colors" title="비밀키 복사">
                                     <i class="fa-regular fa-copy"></i>
                                 </button>
                             </div>
-                            <p class="text-[10px] text-gray-500 text-center">QR 코드 인식이 잘 안 될 경우 앱에 수동으로 위 코드를 등록하십시오.</p>
                         </div>
                     </div>
 
                     <!-- OTP Code Form for Verification -->
                     <form id="verify-form" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5 font-rounded">앱에 표시된 6자리 인증번호</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"><i class="fa-solid fa-clock-rotate-left"></i></span>
-                                <input type="text" id="otp-code" required placeholder="000000" maxlength="6" pattern="[0-9]{6}" autocomplete="off"
-                                    class="w-full bg-gray-950/50 border border-gray-800 rounded-xl py-3 pl-10 pr-4 text-center font-mono text-xl tracking-widest text-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition">
-                            </div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5 font-rounded">앱에 실시간 표시된 6자리 인증코드</label>
+                            <input type="text" id="otp-code" required placeholder="000000" maxlength="6" pattern="[0-9]{6}" autocomplete="off" inputmode="numeric"
+                                class="w-full bg-gray-950/50 border border-gray-800 rounded-xl py-3 text-center font-mono text-xl tracking-widest text-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition">
                         </div>
 
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition shadow-lg shadow-emerald-900/30 flex items-center justify-center space-x-2 font-rounded">
-                            <i class="fa-solid fa-shield-check"></i> <span>2차 OTP 연동 완료 및 로그인</span>
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition flex items-center justify-center space-x-2 font-rounded">
+                            <i class="fa-solid fa-shield-check"></i> <span>2차 OTP 검증 및 완료</span>
                         </button>
                     </form>
                 </div>
 
-                <!-- STEP 3: Admin Dashboard Simulator (Success Screen) -->
-                <div id="step-dashboard" class="hidden h-full">
-                    <div class="flex flex-col h-full space-y-4">
-                        <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-                            <div class="flex items-center space-x-3">
-                                <div class="h-10 w-10 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-lg">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-rounded text-lg font-bold text-gray-100">통합 행정 대시보드</h3>
-                                    <p id="dashboard-user" class="text-xs text-gray-400 font-rounded font-mono">member@dancheon.mil</p>
-                                </div>
-                            </div>
-                            <button onclick="resetProcess()" class="bg-gray-850 hover:bg-gray-800 border border-gray-700 text-gray-300 py-1.5 px-3 rounded-lg transition text-xs flex items-center space-x-1 font-rounded">
-                                <i class="fa-solid fa-right-from-bracket"></i> <span>로그아웃</span>
-                            </button>
+                <!-- 3. 빠른 간편 로그인 잠금해제 폼 (기존 가입 정보가 있을 때 노출) -->
+                <div id="step-lockscreen" class="hidden space-y-6">
+                    <div class="text-center py-4">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-950 border border-indigo-700/50 text-indigo-400 text-2xl mb-3 shadow-lg animate-pulse">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <h3 class="font-rounded text-xl font-bold text-gray-100">행정관 보안 잠금 상태</h3>
+                        <p class="text-xs text-gray-400 mt-1"><span id="lock-email-lbl" class="text-indigo-300 font-mono font-semibold"></span> 계정으로 로그인되어 있습니다.</p>
+                        <p class="text-[11px] text-gray-500 mt-2">앱 등록이 이미 완료되어 있습니다. 기기의 OTP 6자리 숫자만 입력해 주세요.</p>
+                    </div>
+
+                    <form id="lock-verify-form" class="space-y-4">
+                        <div>
+                            <label class="block text-center text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2 font-rounded">스마트폰 OTP 6자리 번호</label>
+                            <input type="text" id="lock-otp-code" required placeholder="000000" maxlength="6" pattern="[0-9]{6}" autocomplete="off" inputmode="numeric"
+                                class="w-full bg-gray-950/50 border border-gray-850 rounded-xl py-3.5 text-center font-mono text-2xl tracking-widest text-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition">
                         </div>
 
-                        <!-- Scrollable Dashboard Content -->
-                        <div class="flex-1 overflow-y-auto pr-2 space-y-4 max-h-[600px] custom-scrollbar">
-                            
-                            <!-- 0. 부대 행정 카테고리 창 -->
-                            <div class="bg-gray-900/50 border border-gray-800 p-4 rounded-xl space-y-4 mb-2">
-                                <h4 class="font-rounded font-semibold text-sky-400 text-sm"><i class="fa-solid fa-folder-tree mr-1"></i> 부대 행정 카테고리</h4>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                    <button onclick="showAlert('메뉴 이동', '인사 관리 및 부대원 명부 시스템으로 이동합니다.')" class="bg-gray-950/50 hover:bg-sky-900/30 border border-gray-800 hover:border-sky-700/50 p-4 rounded-xl text-center transition group">
-                                        <div class="bg-sky-500/10 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 group-hover:bg-sky-500/20 transition">
-                                            <i class="fa-solid fa-users text-sky-400 text-xl"></i>
-                                        </div>
-                                        <p class="text-sm text-gray-200 font-rounded font-semibold">인사 관리</p>
-                                    </button>
-                                    <button onclick="showAlert('메뉴 이동', '훈련 및 작전 통제 시스템으로 이동합니다.')" class="bg-gray-950/50 hover:bg-emerald-900/30 border border-gray-800 hover:border-emerald-700/50 p-4 rounded-xl text-center transition group">
-                                        <div class="bg-emerald-500/10 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 group-hover:bg-emerald-500/20 transition">
-                                            <i class="fa-solid fa-person-rifle text-emerald-400 text-xl"></i>
-                                        </div>
-                                        <p class="text-sm text-gray-200 font-rounded font-semibold">훈련/작전</p>
-                                    </button>
-                                    <button onclick="showAlert('메뉴 이동', '보급품 및 군수 지원 시스템으로 이동합니다.')" class="bg-gray-950/50 hover:bg-yellow-900/30 border border-gray-800 hover:border-yellow-700/50 p-4 rounded-xl text-center transition group">
-                                        <div class="bg-yellow-500/10 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 group-hover:bg-yellow-500/20 transition">
-                                            <i class="fa-solid fa-box-archive text-yellow-400 text-xl"></i>
-                                        </div>
-                                        <p class="text-sm text-gray-200 font-rounded font-semibold">군수/보급</p>
-                                    </button>
-                                    <button onclick="showAlert('메뉴 이동', '보안 및 기밀 문서 열람 시스템으로 이동합니다.')" class="bg-gray-950/50 hover:bg-rose-900/30 border border-gray-800 hover:border-rose-700/50 p-4 rounded-xl text-center transition group">
-                                        <div class="bg-rose-500/10 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 group-hover:bg-rose-500/20 transition">
-                                            <i class="fa-solid fa-file-shield text-rose-400 text-xl"></i>
-                                        </div>
-                                        <p class="text-sm text-gray-200 font-rounded font-semibold">보안/기밀</p>
-                                    </button>
-                                </div>
-                            </div>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl transition flex items-center justify-center space-x-2 font-rounded shadow-lg shadow-indigo-900/40">
+                            <i class="fa-solid fa-unlock"></i> <span>대시보드 잠금 해제</span>
+                        </button>
 
-                            <!-- 0.5. 디스코드 웹훅 설정 창 (신규 간소화 버전) -->
-                            <div class="bg-indigo-950/40 border border-indigo-900/50 p-4 rounded-xl space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <h4 class="font-rounded font-semibold text-indigo-300 text-sm"><i class="fa-brands fa-discord mr-1 text-base"></i> 디스코드 웹훅(Webhook) 설정</h4>
-                                    <span id="webhook-badge" class="text-[10px] bg-gray-850 text-gray-400 px-2.5 py-0.5 rounded-full border border-gray-700">미지정</span>
-                                </div>
-                                <p class="text-[10px] text-gray-400 font-rounded">본인의 디스코드 채널 설정에서 발급받은 웹훅 URL을 입력하면 실시간으로 부대 로그 및 공지가 전송됩니다.</p>
-                                <div class="space-y-2">
-                                    <div class="relative">
-                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"><i class="fa-solid fa-link text-xs"></i></span>
-                                        <input type="password" id="webhook-url-input" placeholder="https://discord.com/api/webhooks/..." class="w-full bg-gray-950/50 border border-gray-800 rounded-lg py-2 pl-9 pr-4 text-xs text-indigo-300 font-mono focus:ring-1 focus:ring-indigo-500 outline-none">
-                                    </div>
-                                    <div class="flex space-x-2">
-                                        <button onclick="saveWebhookSettings()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2 rounded-lg transition font-rounded">
-                                            설정 저장
-                                        </button>
-                                        <button onclick="testWebhook()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs py-2 px-3 rounded-lg transition font-rounded border border-gray-700">
-                                            테스트 메시지 발송
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="text-center pt-2">
+                            <button type="button" onclick="resetProcess(true)" class="text-[11px] text-rose-400/80 hover:text-rose-400 transition font-rounded underline">
+                                다른 계정 등록 혹은 초기화
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-                            <!-- Dynamic Mail Dispatch Logger (보안 알림 상황판) -->
-                            <div id="email-dispatch-box" class="hidden bg-indigo-950/20 border border-indigo-500/30 p-4 rounded-xl space-y-2">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs font-semibold text-indigo-300 font-rounded"><i class="fa-solid fa-paper-plane mr-1"></i>보안 이메일 송신 통제기</span>
-                                    <span id="email-loader" class="text-[10px] text-indigo-400 flex items-center"><i class="fa-solid fa-circle-notch animate-spin mr-1"></i>연결 중</span>
-                                </div>
-                                <div id="email-log-content" class="font-mono text-[10px] text-gray-400 space-y-1">
-                                    <p class="text-indigo-300">[MAIL] 이메일 발송 큐 준비 완료.</p>
-                                </div>
-                            </div>
+            </div>
 
-                            <!-- 2. 공지사항 발송 -->
-                            <div class="bg-gray-900/50 border border-gray-800 p-4 rounded-xl space-y-3">
-                                <h4 class="font-rounded font-semibold text-gray-200 text-sm"><i class="fa-solid fa-bullhorn mr-1 text-yellow-500"></i> 전체 공지 발송 (웹훅 연동)</h4>
-                                <textarea id="notice-text" rows="2" placeholder="디스코드 채널로 전송할 공지 내용을 입력하세요." class="w-full bg-gray-950/50 border border-gray-800 rounded-lg p-2 text-xs text-gray-100 font-rounded focus:ring-1 focus:ring-indigo-500 outline-none resize-none"></textarea>
-                                <button onclick="sendDiscordNotice()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium py-1.5 px-4 rounded-lg transition font-rounded float-right shadow-md">
-                                    공지 전송하기
+        </div>
+
+        <!-- ======================================================= -->
+        <!-- STEP 3: 통합 행정 대시보드 (사이드바 카테고리 완전 연동) -->
+        <!-- ======================================================= -->
+        <div id="step-dashboard" class="hidden w-full max-w-6xl grid grid-cols-1 md:grid-cols-12 gap-6">
+            
+            <!-- 왼쪽 카테고리 네비게이션 리스트 -->
+            <div class="md:col-span-3 flex flex-col justify-between p-4 rounded-2xl glass space-y-6">
+                <div class="space-y-4">
+                    <div class="border-b border-gray-800 pb-3">
+                        <span class="text-xs text-indigo-400 font-rounded tracking-wider font-semibold">ADMIN NAVIGATION</span>
+                        <p id="dashboard-user" class="text-xs text-gray-300 font-mono mt-1 font-semibold truncate">member@dancheon.mil</p>
+                    </div>
+
+                    <nav class="flex flex-col space-y-1.5" id="admin-sidebar-menu">
+                        <!-- 인증 탭 버튼 -->
+                        <button onclick="switchTab('auth')" id="tab-btn-auth" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition text-indigo-400 bg-indigo-950/40 border border-indigo-900/50">
+                            <i class="fa-solid fa-user-shield w-5 text-center"></i>
+                            <span class="font-rounded">인증 관리</span>
+                        </button>
+                        <!-- 채널보기 탭 버튼 -->
+                        <button onclick="switchTab('channel')" id="tab-btn-channel" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition text-gray-400 hover:bg-gray-900/50 hover:text-gray-200">
+                            <i class="fa-solid fa-comments w-5 text-center"></i>
+                            <span class="font-rounded">채널보기 (메시지 뷰어)</span>
+                        </button>
+                        <!-- 인원관리 탭 버튼 -->
+                        <button onclick="switchTab('members')" id="tab-btn-members" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition text-gray-400 hover:bg-gray-900/50 hover:text-gray-200">
+                            <i class="fa-solid fa-users-gear w-5 text-center"></i>
+                            <span class="font-rounded">인원관리 및 제재</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <div class="border-t border-gray-800 pt-4 space-y-3">
+                    <div class="bg-gray-950/40 p-3 rounded-xl border border-gray-800 text-[11px] text-gray-400">
+                        <p class="font-semibold text-emerald-400 mb-1"><i class="fa-solid fa-circle text-[8px] mr-1 animate-pulse"></i>기기 기억 세션 유지 중</p>
+                        로그아웃 전까지는 QR코드 재스캔이 전혀 필요하지 않습니다.
+                    </div>
+                    <button onclick="logoutSession()" class="w-full bg-gray-850 hover:bg-gray-800 border border-gray-700 text-gray-300 font-medium py-2 rounded-xl transition text-xs flex items-center justify-center space-x-1.5 font-rounded">
+                        <i class="fa-solid fa-right-from-bracket"></i> <span>안전 로그아웃 (잠금)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 오른쪽 메인 정보 및 작업 영역 -->
+            <div class="md:col-span-9 p-6 rounded-2xl glass flex flex-col justify-between min-h-[580px] transition-all duration-300">
+                
+                <!-- TAB 1: 인증 관리 -->
+                <div id="tab-content-auth" class="space-y-6">
+                    <div class="border-b border-gray-800 pb-4">
+                        <h3 class="font-rounded text-lg font-bold text-gray-100"><i class="fa-solid fa-user-shield text-indigo-400 mr-2"></i>부대원 가입 심사 및 웹훅 로그</h3>
+                        <p class="text-xs text-gray-400 mt-1">새로 진입을 요청한 유저의 정보를 확인하고 역할을 지급하며, 모든 로그는 웹훅으로 전송됩니다.</p>
+                    </div>
+
+                    <!-- 디스코드 웹훅 설정 창 -->
+                    <div class="bg-indigo-950/20 border border-indigo-900/50 p-4 rounded-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-rounded font-semibold text-indigo-300 text-sm flex items-center gap-2">
+                                <i class="fa-brands fa-discord text-base"></i> 디스코드 알림용 웹훅(Webhook) 연동
+                            </h4>
+                            <span id="webhook-badge" class="text-[10px] bg-gray-850 text-gray-400 px-2.5 py-0.5 rounded-full border border-gray-700">미지정</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 font-rounded">서버 채널에서 발급한 디스코드 웹훅 주소를 입력하면 각종 승인/차단 사항이 해당 채널에 실시간 메시지로 전달됩니다.</p>
+                        <div class="space-y-2">
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"><i class="fa-solid fa-link text-xs"></i></span>
+                                <input type="password" id="webhook-url-input" placeholder="https://discord.com/api/webhooks/..." class="w-full bg-gray-950/50 border border-gray-800 rounded-lg py-2 pl-9 pr-4 text-xs text-indigo-300 font-mono focus:ring-1 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="saveWebhookSettings()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2 rounded-lg transition font-rounded">
+                                    설정 저장
                                 </button>
-                                <div class="clear-both"></div>
+                                <button onclick="testWebhook()" class="bg-gray-850 hover:bg-gray-800 border border-gray-700 text-gray-200 text-xs py-2 px-3 rounded-lg transition font-rounded">
+                                    연동 확인 테스트 메시지 전송
+                                </button>
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- 3. 인증 채널 메시지 관리 -->
-                            <div class="bg-gray-900/50 border border-gray-800 p-4 rounded-xl space-y-3">
-                                <h4 class="font-rounded font-semibold text-gray-200 text-sm"><i class="fa-solid fa-user-shield mr-1 text-emerald-400"></i> 인증 채널 요청 관리</h4>
-                                <div class="bg-gray-950 p-3 rounded-lg border border-gray-800 flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-sm text-gray-400"><i class="fa-solid fa-user"></i></div>
-                                        <div class="text-xs">
-                                            <p class="text-gray-200 font-bold font-rounded text-sm">신입부대원_123</p>
-                                            <p class="text-[10px] text-gray-500 font-rounded mt-0.5">요청: 부대 역할(Role) 부여 승인 대기</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex space-x-1.5">
-                                        <button onclick="manageAuth('approve')" class="bg-emerald-900/40 text-emerald-400 hover:bg-emerald-800 border border-emerald-800 p-2 rounded-lg transition" title="승인"><i class="fa-solid fa-check"></i></button>
-                                        <button onclick="manageAuth('reject')" class="bg-rose-900/40 text-rose-400 hover:bg-rose-800 border border-rose-800 p-2 rounded-lg transition" title="거절 및 삭제"><i class="fa-solid fa-xmark"></i></button>
+                    <!-- 가입 요청 리스트 -->
+                    <div class="space-y-3">
+                        <h4 class="font-rounded font-semibold text-gray-200 text-sm"><i class="fa-solid fa-clock mr-1 text-amber-400"></i> 부대 역할(Role) 부여 승인 대기자 목록</h4>
+                        
+                        <div class="space-y-2 max-h-[180px] overflow-y-auto pr-1 custom-scrollbar">
+                            <div class="bg-gray-950/60 p-3.5 rounded-xl border border-gray-850 flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-9 h-9 rounded-full bg-indigo-950 text-indigo-400 flex items-center justify-center font-bold text-sm">신</div>
+                                    <div>
+                                        <p class="text-gray-200 font-bold font-rounded text-sm">신입부대원_123</p>
+                                        <p class="text-[10px] text-gray-500 font-rounded mt-0.5">요청: Dancheon_Soldier 역할 부여 검증 대기</p>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- 4. 블랙리스트 관리 -->
-                            <div class="bg-gray-900/50 border border-gray-800 p-4 rounded-xl space-y-3">
-                                <h4 class="font-rounded font-semibold text-rose-400 text-sm"><i class="fa-solid fa-ban mr-1"></i> 유저 블랙리스트 관리</h4>
                                 <div class="flex space-x-2">
-                                    <input type="text" id="blacklist-user" placeholder="차단할 유저 ID 또는 닉네임" class="flex-1 bg-gray-950/50 border border-gray-800 rounded-lg p-2 text-xs text-gray-100 font-rounded focus:ring-1 focus:ring-rose-500 outline-none">
-                                    <button onclick="addBlacklist()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium py-1.5 px-4 rounded-lg transition font-rounded shadow-lg shadow-rose-900/20">
-                                        추방/차단
+                                    <button onclick="manageAuth('approve')" class="bg-emerald-950/50 text-emerald-400 hover:bg-emerald-800/40 border border-emerald-800/60 py-1.5 px-3 rounded-lg transition text-xs font-rounded flex items-center space-x-1">
+                                        <i class="fa-solid fa-check"></i> <span>역할 승인</span>
+                                    </button>
+                                    <button onclick="manageAuth('reject')" class="bg-rose-950/50 text-rose-400 hover:bg-rose-800/40 border border-rose-800/60 py-1.5 px-3 rounded-lg transition text-xs font-rounded flex items-center space-x-1">
+                                        <i class="fa-solid fa-xmark"></i> <span>반려</span>
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- TAB 2: 디스코드 채널보기 (채널 ID 입력 및 메시지 실시간 뷰어) -->
+                <div id="tab-content-channel" class="hidden space-y-5">
+                    <div class="border-b border-gray-800 pb-4">
+                        <h3 class="font-rounded text-lg font-bold text-gray-100"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i>디스코드 채널 메시지 뷰어</h3>
+                        <p class="text-xs text-gray-400 mt-1">원하는 디스코드 채널 ID를 등록하여 관리자 포탈에서 메시지 송수신 상황을 확인하고 제어합니다.</p>
+                    </div>
+
+                    <!-- 채널 ID 설정창 -->
+                    <div class="bg-gray-900/60 border border-gray-800 p-4 rounded-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-rounded font-semibold text-sky-400 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-hashtag"></i> 실시간 모니터링 채널 ID 입력
+                            </h4>
+                            <span id="channel-badge" class="text-[10px] bg-gray-850 text-gray-400 px-2.5 py-0.5 rounded-full border border-gray-700">연동 대기</span>
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"><i class="fa-solid fa-hashtag text-xs"></i></span>
+                                <input type="text" id="discord-channel-id" placeholder="디스코드 채널 ID (예: 1109413697926710400)" class="w-full bg-gray-950/50 border border-gray-800 rounded-lg py-2.5 pl-9 pr-4 text-xs text-indigo-300 font-mono focus:ring-1 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <button onclick="loadChannelById()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2 px-4 rounded-lg transition font-rounded">
+                                채널 연결
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 디스코드 테마 메시지 모니터 레이아웃 -->
+                    <div class="bg-[#313338] rounded-xl border border-gray-800 flex flex-col h-[320px] overflow-hidden">
+                        <!-- 채널 헤더 -->
+                        <div class="bg-[#313338] border-b border-[#2e3035] px-4 py-2.5 flex items-center space-x-2">
+                            <i class="fa-solid fa-hashtag text-gray-400 text-lg"></i>
+                            <span id="channel-title-lbl" class="text-sm font-bold text-gray-200 font-rounded">채널을 먼저 연동해 주세요</span>
+                            <span id="channel-id-sub-lbl" class="text-[10px] text-gray-500 font-mono"></span>
+                        </div>
+
+                        <!-- 실시간 메시지 피드 창 -->
+                        <div id="discord-chat-feed" class="flex-1 p-4 overflow-y-auto space-y-4 custom-scrollbar bg-[#313338]">
+                            <p class="text-center text-xs text-gray-500 font-rounded py-8">메니페스트 채널 ID를 입력하여 메시지 흐름을 활성화해 주십시오.</p>
+                        </div>
+
+                        <!-- 메시지 전송 영역 (웹훅 동시 송출) -->
+                        <div class="p-3 bg-[#313338] border-t border-[#2e3035]">
+                            <div class="relative flex items-center bg-[#383a40] rounded-lg">
+                                <input type="text" id="chat-input-text" placeholder="# 채널에 메시지 보내기 (엔터 혹은 전송)" class="w-full bg-transparent border-none py-2.5 pl-4 pr-12 text-xs text-gray-100 placeholder-gray-500 outline-none">
+                                <button onclick="sendChatMessage()" class="absolute right-2 text-indigo-400 hover:text-indigo-300 p-1.5 transition">
+                                    <i class="fa-solid fa-paper-plane text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: 인원관리 및 제재 -->
+                <div id="tab-content-members" class="hidden space-y-6">
+                    <div class="border-b border-gray-800 pb-4">
+                        <h3 class="font-rounded text-lg font-bold text-gray-100"><i class="fa-solid fa-users-gear text-indigo-400 mr-2"></i>인원 관리 및 블랙리스트</h3>
+                        <p class="text-xs text-gray-400 mt-1">부대 내 특이 행위자 및 규칙 위반자를 추적하여 차단하고, 그 기록을 관리합니다.</p>
+                    </div>
+
+                    <!-- 블랙리스트 등록 폼 -->
+                    <div class="bg-gray-900/60 border border-gray-800 p-5 rounded-xl space-y-4">
+                        <h4 class="font-rounded font-semibold text-rose-400 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-ban"></i> 특이 부대원 블랙리스트 추방 명령
+                        </h4>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1 font-rounded">지정 대상자 닉네임 / ID</label>
+                                <input type="text" id="blacklist-user" placeholder="예: 무단활동_홍길동" class="w-full bg-gray-950/50 border border-gray-850 rounded-lg p-2 text-xs text-gray-100 font-rounded outline-none focus:ring-1 focus:ring-rose-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1 font-rounded">사유 및 위반 사항</label>
+                                <input type="text" id="blacklist-reason" placeholder="예: 무단 비인가 구역 접근 시도" class="w-full bg-gray-950/50 border border-gray-850 rounded-lg p-2 text-xs text-gray-100 font-rounded outline-none focus:ring-1 focus:ring-rose-500">
+                            </div>
+                        </div>
+
+                        <button onclick="addBlacklist()" class="w-full bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold py-2.5 rounded-lg transition font-rounded shadow-lg shadow-rose-900/30">
+                            부대 블랙리스트 강제 추방 및 로그 기록
+                        </button>
+                    </div>
+
+                    <!-- 최근 제재 내역 리스트 -->
+                    <div class="space-y-3">
+                        <span class="text-xs font-semibold text-gray-400 font-rounded block"><i class="fa-solid fa-list-check mr-1"></i> 최근 24시간 제재 및 처분 현황</span>
+                        <div class="bg-gray-950/50 border border-gray-800 rounded-xl overflow-hidden">
+                            <div class="grid grid-cols-12 bg-gray-900/80 p-2.5 text-xs text-gray-400 border-b border-gray-850 font-rounded font-bold text-center">
+                                <div class="col-span-3">처분 시간</div>
+                                <div class="col-span-3">대상자</div>
+                                <div class="col-span-4">위반 사실</div>
+                                <div class="col-span-2">상태</div>
+                            </div>
+                            <div id="blacklist-record-container" class="text-xs text-gray-300 font-rounded max-h-[150px] overflow-y-auto custom-scrollbar">
+                                <div class="grid grid-cols-12 p-3 text-center border-b border-gray-900/60 items-center">
+                                    <div class="col-span-3 text-gray-500 text-[11px] font-mono">2026-05-28 22:15</div>
+                                    <div class="col-span-3 font-semibold text-rose-300">경고조치_갑동</div>
+                                    <div class="col-span-4 text-left pl-2 truncate text-[11px]">정해진 구역 외 비인가 시설 무단 출입</div>
+                                    <div class="col-span-2"><span class="bg-amber-900/30 text-amber-400 text-[10px] px-2 py-0.5 rounded border border-amber-800/40">처분완료</span></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -364,9 +466,9 @@
         <div class="glass max-w-md w-full m-4 p-6 rounded-2xl border border-gray-800 shadow-2xl transform scale-95 transition-transform duration-300">
             <div class="flex items-center space-x-3 text-rose-400 mb-3" id="alert-title-container">
                 <i class="fa-solid fa-triangle-exclamation text-xl"></i>
-                <h4 class="font-bold text-lg font-rounded" id="alert-title">오류 발생</h4>
+                <h4 class="font-bold text-lg font-rounded" id="alert-title">알림</h4>
             </div>
-            <p id="alert-message" class="text-sm text-gray-300 mb-6 leading-relaxed">경고 메시지 내용입니다.</p>
+            <p id="alert-message" class="text-sm text-gray-300 mb-6 leading-relaxed">알림 메시지 내용입니다.</p>
             <div class="flex justify-end">
                 <button onclick="closeAlert()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 px-5 rounded-xl text-sm transition font-rounded">
                     확인
@@ -377,42 +479,90 @@
 
     <!-- Footer -->
     <footer class="glass border-t border-gray-800 px-6 py-4 text-center text-xs text-gray-500 font-rounded">
-        <p>&copy; 2026 단천부대 행정업무 시스템. Powered by secure MFA/TOTP.</p>
+        <p>&copy; 2026 단천부대 통합행정포탈. 본 사이트는 합법적인 부대 관리 규정을 준수합니다.</p>
     </footer>
 
     <script>
-        // EmailJS 실제 사용을 원하는 경우 활성화 안내:
-        // 1. https://www.emailjs.com/ 가입 후 Service ID, Template ID, Public Key 발급
-        const EMAILJS_PUBLIC_KEY = ""; 
-        const EMAILJS_SERVICE_ID = ""; 
-        const EMAILJS_TEMPLATE_ID = ""; 
-
-        if (EMAILJS_PUBLIC_KEY) {
-            emailjs.init(EMAILJS_PUBLIC_KEY);
-        }
+        // ==========================================
+        // 🔒 로컬 세션 및 기기 기억장치 관리 모듈
+        // ==========================================
+        const STORAGE_KEY_EMAIL = 'dancheon_admin_email_secure';
+        const STORAGE_KEY_SECRET = 'dancheon_admin_secret_secure';
+        const STORAGE_KEY_WEBHOOK = 'dancheon_admin_webhook_secure';
+        const STORAGE_KEY_CHANNEL = 'dancheon_admin_channel_secure';
 
         // State variables
         let secretKey = '';
         let qrCodeInstance = null;
         let registeredEmail = '';
-        let isEmailNotifyEnabled = true;
-        
-        // 디스코드 웹훅 전용 변수
         let discordWebhookUrl = '';
-        
-        // Step elements
+        let discordChannelId = '';
+
+        // UI Steps Elements
         const stepReg = document.getElementById('step-registration');
         const stepQr = document.getElementById('step-qr');
+        const stepLockscreen = document.getElementById('step-lockscreen');
         const stepDashboard = document.getElementById('step-dashboard');
+        const authContainer = document.getElementById('auth-container');
 
         // Form elements
         const regForm = document.getElementById('reg-form');
         const verifyForm = document.getElementById('verify-form');
+        const lockVerifyForm = document.getElementById('lock-verify-form');
+
+        // Page Load Initializer
+        window.onload = function() {
+            loadSavedSession();
+            
+            // 엔터키 전송 지원
+            document.getElementById('chat-input-text').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+        };
 
         /**
-         * Helper: Base32 string to Uint8Array decoder
-         * Essential for translating standard OTP secret keys (RFC 3548 / RFC 4648)
+         * 로컬 스토리지 데이터 검사 후 부팅 분기 선택
          */
+        function loadSavedSession() {
+            const savedEmail = localStorage.getItem(STORAGE_KEY_EMAIL);
+            const savedSecret = localStorage.getItem(STORAGE_KEY_SECRET);
+            const savedWebhook = localStorage.getItem(STORAGE_KEY_WEBHOOK);
+            const savedChannel = localStorage.getItem(STORAGE_KEY_CHANNEL);
+
+            if (savedEmail && savedSecret) {
+                // 이미 계정이 완벽하게 기기에 등록된 상태인 경우 -> 바로 잠금 화면 노출
+                registeredEmail = savedEmail;
+                secretKey = savedSecret;
+
+                document.getElementById('lock-email-lbl').textContent = savedEmail;
+                stepReg.classList.add('hidden');
+                stepQr.classList.add('hidden');
+                stepLockscreen.classList.remove('hidden');
+            } else {
+                // 계정이 하나도 보관되어 있지 않은 클린 환경인 경우 -> 가입 유도
+                stepReg.classList.remove('hidden');
+                stepQr.classList.add('hidden');
+                stepLockscreen.classList.add('hidden');
+            }
+
+            if (savedWebhook) {
+                discordWebhookUrl = savedWebhook;
+                document.getElementById('webhook-url-input').value = savedWebhook;
+                updateWebhookBadge(true);
+            }
+
+            if (savedChannel) {
+                discordChannelId = savedChannel;
+                document.getElementById('discord-channel-id').value = savedChannel;
+                loadChannelById(true);
+            }
+        }
+
+        // ==========================================
+        // 🔒 TOTP 보안 알고리즘 기저 디코더 (Web Crypto)
+        // ==========================================
         function base32ToBytes(base32) {
             const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
             base32 = base32.replace(/=+$/, "").toUpperCase();
@@ -434,29 +584,20 @@
             return bytes;
         }
 
-        /**
-         * Helper: Converts a counter integer to an 8-byte ArrayBuffer (big endian)
-         * Required for modern native HMAC-SHA1 Web Crypto hashing
-         */
         function counterToBuffer(counter) {
             const buffer = new ArrayBuffer(8);
             const view = new DataView(buffer);
-            view.setUint32(0, 0, false); // High 32 bits (zeroed for current epochs)
-            view.setUint32(4, counter, false); // Low 32 bits
+            view.setUint32(0, 0, false);
+            view.setUint32(4, counter, false);
             return buffer;
         }
 
-        /**
-         * Native Web-Crypto API based TOTP Engine
-         * Evaluates OTP token completely locally without relying on shaky/broken CDN scripts!
-         */
         async function generateTOTP(secret, timeStep = 30) {
             try {
                 const secretBytes = base32ToBytes(secret);
                 const counter = Math.floor(Date.now() / 1000 / timeStep);
                 const counterBuf = counterToBuffer(counter);
                 
-                // Import the base32 key into cryptographic SubtleCrypto context
                 const key = await window.crypto.subtle.importKey(
                     "raw",
                     secretBytes,
@@ -465,7 +606,6 @@
                     ["sign"]
                 );
                 
-                // Sign the counter bytes using HMAC-SHA1
                 const signature = await window.crypto.subtle.sign(
                     "HMAC",
                     key,
@@ -475,7 +615,6 @@
                 const hmac = new Uint8Array(signature);
                 const offset = hmac[hmac.length - 1] & 0xf;
                 
-                // Dynamic truncation sequence
                 const binary = ((hmac[offset] & 0x7f) << 24) |
                                ((hmac[offset + 1] & 0xff) << 16) |
                                ((hmac[offset + 2] & 0xff) << 8) |
@@ -484,14 +623,11 @@
                 const otp = binary % 1000000;
                 return otp.toString().padStart(6, '0');
             } catch (err) {
-                console.error("MFA TOTP Generation Error:", err);
+                console.error("TOTP 연산 오류:", err);
                 return null;
             }
         }
 
-        /**
-         * Generates a random Base32 string suitable for OTP secrets
-         */
         function generateBase32Secret() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
             let secret = '';
@@ -502,9 +638,9 @@
             return secret;
         }
 
-        /**
-         * Custom Modal alert to avoid native block/alert popups
-         */
+        // ==========================================
+        // 💬 알림 및 모달 제어 함수
+        // ==========================================
         function showAlert(title, message, isSuccess = false) {
             const modal = document.getElementById('custom-alert');
             const titleContainer = document.getElementById('alert-title-container');
@@ -540,195 +676,435 @@
             }, 300);
         }
 
-        /**
-         * Handle Step 1 Submit (Registration & Secret Generation)
-         */
+        // ==========================================
+        // 🚀 신규 등록 등록 이벤트 (최초 1회만 실행됨)
+        // ==========================================
         regForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
             registeredEmail = document.getElementById('admin-email').value.trim();
             const password = document.getElementById('admin-pw').value;
-            isEmailNotifyEnabled = document.getElementById('email-notify-check').checked;
 
             if(!registeredEmail || !password) {
-                showAlert('입력 오류', '모든 필드를 정확하게 기입해 주세요.');
+                showAlert('입력 오류', '모든 필드를 기입해 주세요.');
                 return;
             }
 
-            // Generate real dynamic Secret Key
+            // 새로운 OTP 기기 매치용 임시 비밀키 생성
             secretKey = generateBase32Secret();
 
-            // Set up standardized otpauth URI for Dancheon Unit
+            // 영구 세션 보관처리 (기억 모드 돌입)
+            localStorage.setItem(STORAGE_KEY_EMAIL, registeredEmail);
+            localStorage.setItem(STORAGE_KEY_SECRET, secretKey);
+
+            // 표준 otpauth URI 생성
             const issuer = 'DancheonUnit';
             const otpauthUri = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(registeredEmail)}?secret=${secretKey}&issuer=${encodeURIComponent(issuer)}`;
 
-            // Display secret key visually
             document.getElementById('secret-key-display').textContent = secretKey;
 
-            // Generate QR Code inside container
             const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = ''; // clear previous
+            qrContainer.innerHTML = '';
             
             try {
                 qrCodeInstance = new QRCode(qrContainer, {
                     text: otpauthUri,
-                    width: 180,
-                    height: 180,
+                    width: 170,
+                    height: 170,
                     colorDark: "#000000",
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.H
                 });
             } catch(err) {
-                console.error('QR 코드 생성 실패', err);
-                showAlert('시스템 오류', 'QR 코드 생성에 실패했습니다. 수동 비밀키를 이용해 주세요.');
+                console.error(err);
             }
 
-            // Move to Step 2
             stepReg.classList.add('hidden');
             stepQr.classList.remove('hidden');
             
-            showAlert('보안 비밀키 발급 완료', '인증 앱에 단천부대 계정을 등록할 준비가 되었습니다.', true);
+            showAlert('보안키 발급 완료', '세션에 암호키가 저장되었습니다. 스마트폰 앱으로 한번 스캔해 주세요.', true);
         });
 
         /**
-         * Simulates sending a secure email visually
-         */
-        function simulateEmailDispatch() {
-            const emailBox = document.getElementById('email-dispatch-box');
-            const logContent = document.getElementById('email-log-content');
-            const loader = document.getElementById('email-loader');
-            
-            emailBox.classList.remove('hidden');
-            logContent.innerHTML = '<p class="text-indigo-300">[MAIL] 보안 메일 발송 큐 준비 완료.</p>';
-            
-            const logs = [
-                { time: 600, text: `[INFO] 메일 주소 형식 확인 완료 (${registeredEmail})` },
-                { time: 1300, text: `[SENDING] 단천부대 SMTP 메일 릴레이 서버 연결 시도...` },
-                { time: 2100, text: `[SECURE] TLS 1.3 보안 세션 수립 완료.` },
-                { time: 2800, text: `[SUCCESS] 보안 접속 성공 로그 메일 전송 완료!` }
-            ];
-
-            logs.forEach(log => {
-                setTimeout(() => {
-                    const p = document.createElement('p');
-                    if (log.text.includes('SUCCESS')) {
-                        p.className = 'text-emerald-400 font-semibold';
-                        loader.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i>발송 완료';
-                    } else if (log.text.includes('SENDING')) {
-                        p.className = 'text-yellow-400';
-                    } else {
-                        p.className = 'text-gray-400';
-                    }
-                    p.textContent = log.text;
-                    logContent.appendChild(p);
-                }, log.time);
-            });
-
-            // If EmailJS credentials are provided, attempt actual mail send
-            if (EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
-                const templateParams = {
-                    to_email: registeredEmail,
-                    secure_time: new Date().toLocaleString('ko-KR'),
-                    mfa_status: "MFA 2차 인증 연동 성공 (보안 최상)"
-                };
-
-                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-                    .then(function(response) {
-                        console.log('실제 이메일 발송 성공!', response.status, response.text);
-                    }, function(error) {
-                        console.error('실제 이메일 발송 실패...', error);
-                    });
-            }
-        }
-
-        /**
-         * Handle Step 2 Submit (OTP Code Verification)
-         * Integrated with the native, async crypto TOTP generator
+         * 최초 OTP 등록 검증 통과 폼
          */
         verifyForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             const enteredCode = document.getElementById('otp-code').value.trim();
-            
-            if(enteredCode.length !== 6 || isNaN(enteredCode)) {
-                showAlert('인증번호 오류', '정확한 6자리 숫자를 입력해 주십시오.');
+            await completeUnlock(enteredCode, stepQr);
+        });
+
+        /**
+         * 세션 기억 및 재접속 시 잠금 해제 폼
+         */
+        lockVerifyForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const enteredCode = document.getElementById('lock-otp-code').value.trim();
+            await completeUnlock(enteredCode, stepLockscreen);
+        });
+
+        /**
+         * 최종 잠금 해제 처리 핵심 컨트롤러
+         */
+        async function completeUnlock(code, currentStepEl) {
+            if(code.length !== 6 || isNaN(code)) {
+                showAlert('입력 오류', '올바른 6자리 숫자를 기입해 주세요.');
                 return;
             }
 
             try {
-                // Generate standard RFC 6238 TOTP using local Web Crypto API
                 const expectedCode = await generateTOTP(secretKey);
 
-                // Verify the current code
-                if (enteredCode === expectedCode) {
-                    // Success Transition to Dashboard
-                    stepQr.classList.add('hidden');
+                if (code === expectedCode) {
+                    // 잠금해제 및 대시보드 진입
+                    authContainer.classList.add('hidden');
                     stepDashboard.classList.remove('hidden');
                     
-                    // 레이아웃 확장 (왼쪽 안내문 숨기고 대시보드를 꽉 채움)
-                    document.getElementById('info-card').classList.add('hidden');
-                    document.getElementById('action-area').classList.remove('md:col-span-7');
-                    document.getElementById('action-area').classList.add('md:col-span-12');
-                    document.getElementById('main-grid').classList.remove('max-w-4xl');
-                    document.getElementById('main-grid').classList.add('max-w-6xl');
-                    
                     document.getElementById('dashboard-user').textContent = registeredEmail;
-                    showAlert('OTP 연동 성공', '인증이 안전하게 동기화되었습니다. 단천부대 행정망에 로그인합니다.', true);
+                    document.getElementById('lock-otp-code').value = '';
+                    document.getElementById('otp-code').value = '';
 
-                    // Trigger simulated/real email dispatch if checked
-                    if (isEmailNotifyEnabled) {
-                        simulateEmailDispatch();
-                    } else {
-                        document.getElementById('email-dispatch-box').classList.add('hidden');
-                    }
+                    // 디스코드 접속 기록 통지
+                    sendToWebhook({
+                        embeds: [{
+                            title: "🔓 단천부대 통합 사령망 잠금 해제",
+                            description: `**행정관:** \`${registeredEmail}\`\n**인증 종류:** \`2차 OTP 보안키 일치\`\n**접속 일시:** ${new Date().toLocaleString('ko-KR')}\n**세션 유지 상태:** \`안전 보관 작동 중\``,
+                            color: 3447003,
+                            footer: { text: "Dancheon Security Firewall" }
+                        }]
+                    });
+
+                    switchTab('auth');
+                    showAlert('잠금 해제 완료', '통합 행정 콘솔 권한이 인가되었습니다.', true);
                 } else {
-                    showAlert('검증 실패', '시간 지연 등으로 코드가 일치하지 않습니다. 스마트폰 시계가 현재 표준 시간과 동기화되었는지 확인 후 다시 입력해주세요.');
+                    showAlert('검증 실패', '시간 지연 등으로 임시 코드가 맞지 않습니다. 스마트폰 앱의 번호를 다시 입력해 주십시오.');
                 }
             } catch(err) {
                 console.error(err);
-                showAlert('오류 발생', 'TOTP 알고리즘 검증 중 오류가 발생했습니다.');
+                showAlert('시스템 오류', 'OTP 알고리즘 연산 중 시스템 예외가 발생했습니다.');
             }
-        });
-
-        /**
-         * Navigation Helper Functions
-         */
-        function goBackToStep1() {
-            stepQr.classList.add('hidden');
-            stepReg.classList.remove('hidden');
         }
 
-        function resetProcess() {
-            // Clear inputs
-            document.getElementById('admin-email').value = '';
-            document.getElementById('admin-pw').value = '';
-            document.getElementById('terms-check').checked = false;
-            document.getElementById('otp-code').value = '';
+        // ==========================================
+        // 🎛️ 사이드바 카테고리 탭(Tab) 제어 모듈
+        // ==========================================
+        function switchTab(targetTab) {
+            const tabs = ['auth', 'channel', 'members'];
             
-            secretKey = '';
-            registeredEmail = '';
-            discordWebhookUrl = '';
-            
-            // 웹훅 배지 및 인풋 초기화
+            tabs.forEach(tab => {
+                const contentEl = document.getElementById(`tab-content-${tab}`);
+                const btnEl = document.getElementById(`tab-btn-${tab}`);
+                
+                if (tab === targetTab) {
+                    contentEl.classList.remove('hidden');
+                    btnEl.className = "flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition text-indigo-400 bg-indigo-950/40 border border-indigo-900/50";
+                } else {
+                    contentEl.classList.add('hidden');
+                    btnEl.className = "flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition text-gray-400 hover:bg-gray-900/50 hover:text-gray-200";
+                }
+            });
+        }
+
+        // ==========================================
+        // 🚀 디스코드 알림용 웹훅 송출 모듈
+        // ==========================================
+        function updateWebhookBadge(isConnected) {
             const badge = document.getElementById('webhook-badge');
-            badge.className = "text-[10px] bg-gray-850 text-gray-400 px-2.5 py-0.5 rounded-full border border-gray-700";
-            badge.textContent = "미지정";
-            document.getElementById('webhook-url-input').value = '';
+            if (isConnected) {
+                badge.className = "text-[10px] bg-emerald-950 text-emerald-400 px-2.5 py-0.5 rounded-full border border-emerald-800";
+                badge.textContent = "연동 완료";
+            } else {
+                badge.className = "text-[10px] bg-gray-850 text-gray-400 px-2.5 py-0.5 rounded-full border border-gray-700";
+                badge.textContent = "미지정";
+            }
+        }
 
-            // 레이아웃 복구 (왼쪽 안내문 다시 표시 및 원래 너비로 되돌림)
-            document.getElementById('info-card').classList.remove('hidden');
-            document.getElementById('action-area').classList.remove('md:col-span-12');
-            document.getElementById('action-area').classList.add('md:col-span-7');
-            document.getElementById('main-grid').classList.remove('max-w-6xl');
-            document.getElementById('main-grid').classList.add('max-w-4xl');
-            
-            // Go to start
-            stepDashboard.classList.add('hidden');
-            stepReg.classList.remove('hidden');
+        function saveWebhookSettings() {
+            const urlInput = document.getElementById('webhook-url-input').value.trim();
+
+            if(!urlInput) {
+                showAlert('입력 오류', '디스코드 웹훅 주소를 입력해 주세요.');
+                return;
+            }
+
+            if(!urlInput.startsWith('https://discord.com/api/webhooks/')) {
+                showAlert('형식 오류', '올바른 디스코드 웹훅 URL 형식 구조가 아닙니다.');
+                return;
+            }
+
+            discordWebhookUrl = urlInput;
+            localStorage.setItem(STORAGE_KEY_WEBHOOK, urlInput);
+            updateWebhookBadge(true);
+
+            showAlert('웹훅 연동 완료', '알림 통지 웹훅 설정이 기기에 보관되었습니다.', true);
+        }
+
+        async function sendToWebhook(payload) {
+            if(!discordWebhookUrl) return false;
+
+            try {
+                const response = await fetch(discordWebhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                return response.ok;
+            } catch (err) {
+                console.error("웹훅 발송 실패:", err);
+                return false;
+            }
+        }
+
+        async function testWebhook() {
+            if(!discordWebhookUrl) {
+                showAlert('연동 대기', '웹훅 주소를 지정하고 저장한 뒤 버튼을 누르세요.');
+                return;
+            }
+
+            const success = await sendToWebhook({
+                content: `🔔 **[단천부대 행정망 알림 시스템]** 웹훅과의 쌍방향 교신 채널이 성공적으로 활성화되었습니다.`
+            });
+
+            if(success) {
+                showAlert('테스트 전송 성공', '디스코드 채널로 실시간 연동 테스트 로그를 발송했습니다.', true);
+            } else {
+                showAlert('전송 실패', '웹훅 주소가 유효하지 않거나 디스코드 서버 상태를 점검해 보세요.');
+            }
+        }
+
+        // ==========================================
+        // 💬 디스코드 채널 ID 기반 실시간 메시지 뷰어 엔진
+        // ==========================================
+        function updateChannelBadge(isConnected) {
+            const badge = document.getElementById('channel-badge');
+            if (isConnected) {
+                badge.className = "text-[10px] bg-sky-950 text-sky-400 px-2.5 py-0.5 rounded-full border border-sky-800";
+                badge.textContent = "연동 완료";
+            } else {
+                badge.className = "text-[10px] bg-gray-850 text-gray-400 px-2.5 py-0.5 rounded-full border border-gray-700";
+                badge.textContent = "연동 대기";
+            }
         }
 
         /**
-         * Clipboard support using standard execCommand (iframe restriction safe)
+         * 입력받은 디스코드 채널 ID를 활용해 모니터링 모듈 구동
+         */
+        function loadChannelById(isAuto = false) {
+            const inputId = document.getElementById('discord-channel-id').value.trim();
+
+            if(!inputId) {
+                if(!isAuto) showAlert('입력 누락', '연동할 채널 ID를 기재하십시오.');
+                return;
+            }
+
+            discordChannelId = inputId;
+            localStorage.setItem(STORAGE_KEY_CHANNEL, inputId);
+            updateChannelBadge(true);
+
+            // 헤더 레이블 수정
+            document.getElementById('channel-title-lbl').textContent = `통제 채널 모니터링`;
+            document.getElementById('channel-id-sub-lbl').textContent = `(ID: ${discordChannelId})`;
+
+            // 메시지 가상 피드 렌더링
+            const feed = document.getElementById('discord-chat-feed');
+            feed.innerHTML = '';
+
+            const initMessages = [
+                { user: "신입부대원_123", avatar: "신", color: "text-sky-400", time: "오후 10:11", text: "가입 승인 대기중입니다! 잘 부탁드립니다." },
+                { user: "Dancheon_Guard", avatar: "G", color: "text-emerald-400", time: "오후 10:15", text: "[알림] 신규 기기 접속 로그 확인: 검증 대기 리포트 송신됨." },
+                { user: "부대원_갑동", avatar: "갑", color: "text-indigo-400", time: "오후 10:19", text: "정기 부대 활동 회의 일정 공지사항 어디서 보나요?" }
+            ];
+
+            initMessages.forEach(msg => {
+                appendChatMessage(msg.user, msg.avatar, msg.color, msg.time, msg.text);
+            });
+
+            if(!isAuto) {
+                showAlert('채널 연동 완료', `채널 ID ${discordChannelId}와 관리자 포탈 피드가 매칭되었습니다.`, true);
+            }
+        }
+
+        /**
+         * 디스코드 스타일 채팅 삽입 모듈
+         */
+        function appendChatMessage(user, avatar, colorClass, time, text) {
+            const feed = document.getElementById('discord-chat-feed');
+            
+            const msgRow = document.createElement('div');
+            msgRow.className = "flex items-start space-x-3 text-xs leading-relaxed";
+            msgRow.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-[#35363c] flex items-center justify-center font-bold text-gray-200">${avatar}</div>
+                <div>
+                    <div class="flex items-baseline space-x-2">
+                        <span class="font-bold ${colorClass}">${user}</span>
+                        <span class="text-[9px] text-gray-500">${time}</span>
+                    </div>
+                    <p class="text-[#dbdee1] mt-0.5">${text}</p>
+                </div>
+            `;
+            feed.appendChild(msgRow);
+            feed.scrollTop = feed.scrollHeight;
+        }
+
+        /**
+         * 채널 모니터에서 메시지 발송하기 (웹훅이 지정되어 있을 시 웹훅으로도 송출)
+         */
+        function sendChatMessage() {
+            const textInput = document.getElementById('chat-input-text');
+            const val = textInput.value.trim();
+
+            if(!val) return;
+
+            if(!discordChannelId) {
+                showAlert('연동 지연', '채널 ID를 먼저 등록하고 메시지를 전송하세요.');
+                return;
+            }
+
+            const now = new Date();
+            const timeStr = `${now.getHours() > 12 ? '오후' : '오전'} ${now.getHours() > 12 ? now.getHours()-12 : now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            // 1. 포탈 내 피드에 추가
+            appendChatMessage("행정관 (나)", "행", "text-indigo-300", timeStr, val);
+
+            // 2. 만약 웹훅 설정이 함께 되어 있다면, 디스코드 실제 채널로도 송출
+            if(discordWebhookUrl) {
+                sendToWebhook({
+                    content: `💬 **[행정관 메시지]** ${val}`
+                });
+            }
+
+            textInput.value = '';
+        }
+
+        // ==========================================
+        // 📢 대시보드 인사 권한 관리 및 제재 제어 모듈
+        // ==========================================
+        async function manageAuth(action) {
+            let desc = '';
+            let color = 0;
+
+            if (action === 'approve') {
+                desc = "✅ **[역할 승인 조치]** 행정관에 의해 `신입부대원_123` 님의 정식 가입 승인 및 소대 역할 배정이 정상 **통과**되었습니다.";
+                color = 3066993; // Green
+                showAlert('승인 완료', '해당 유저에게 정식 역할이 지급되었으며 디스코드 로그로 저장됩니다.', true);
+            } else {
+                desc = "❌ **[인증 반려 조치]** `신입부대원_123` 님의 권한 가입 신청이 규격 불일치로 **기각** 처리되었습니다.";
+                color = 15158332; // Red
+                showAlert('인증 반려 완료', '가입 거절 사실이 아카이브에 안전하게 보고되었습니다.');
+            }
+
+            if (discordWebhookUrl) {
+                sendToWebhook({
+                    embeds: [{
+                        description: desc,
+                        color: color,
+                        footer: { text: "Dancheon Admission System" }
+                    }]
+                });
+            }
+        }
+
+        function addBlacklist() {
+            const user = document.getElementById('blacklist-user').value.trim();
+            const reason = document.getElementById('blacklist-reason').value.trim() || '행정 보안 규정 미준수';
+
+            if (!user) {
+                showAlert('입력 누락', '제재할 대상자를 정밀하게 입력하세요.');
+                return;
+            }
+
+            // 테이블에 조치 결과 로그 한 행 추가
+            const container = document.getElementById('blacklist-record-container');
+            const row = document.createElement('div');
+            row.className = "grid grid-cols-12 p-3 text-center border-b border-gray-900/60 items-center bg-rose-950/10";
+            
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+            row.innerHTML = `
+                <div class="col-span-3 text-gray-500 text-[11px] font-mono">${timeStr}</div>
+                <div class="col-span-3 font-semibold text-rose-400">${user}</div>
+                <div class="col-span-4 text-left pl-2 truncate text-[11px]">${reason}</div>
+                <div class="col-span-2"><span class="bg-rose-900/30 text-rose-400 text-[10px] px-2 py-0.5 rounded border border-rose-800/40">추방완료</span></div>
+            `;
+
+            container.insertBefore(row, container.firstChild);
+            showAlert('제재 처리 성공', `[${user}] 부대원을 추방 처리하고 해당 내역을 전송했습니다.`, true);
+
+            // 웹훅 전송
+            if (discordWebhookUrl) {
+                sendToWebhook({
+                    embeds: [{
+                        title: "🚫 특이 행위자 부대 제외 및 차단 보고",
+                        description: `**처분 대상:** \`${user}\`\n**처분 근거:** ${reason}\n**담당 행정관:** \`${registeredEmail}\`\n**처분 시각:** ${timeStr}`,
+                        color: 15158332,
+                        footer: { text: "Dancheon Blacklist Records" }
+                    }]
+                });
+            }
+
+            document.getElementById('blacklist-user').value = '';
+            document.getElementById('blacklist-reason').value = '';
+        }
+
+        // ==========================================
+        // 🔙 세션 임시 잠금 및 영구 청소 모듈
+        // ==========================================
+        
+        /**
+         * 단순히 현재 화면만 걸어두고 OTP 번호만 있으면 즉시 재진입하게 만듬 (매우 편리!)
+         */
+        function logoutSession() {
+            stepDashboard.classList.add('hidden');
+            authContainer.classList.remove('hidden');
+            stepReg.classList.add('hidden');
+            stepQr.classList.add('hidden');
+            stepLockscreen.classList.remove('hidden');
+            
+            document.getElementById('lock-otp-code').focus();
+            showAlert('보안 잠금 가동', '콘솔 이용이 중단되고 계정이 잠겼습니다. OTP 6자리로 잠금을 해제할 수 있습니다.', true);
+        }
+
+        /**
+         * 기기 보관 정보를 완전히 지우고 처음 가입 상태로 돌아감
+         */
+        function resetProcess(forceReset = false) {
+            if (forceReset) {
+                // 정말 초기화할지 유저 검사 확인
+                localStorage.removeItem(STORAGE_KEY_EMAIL);
+                localStorage.removeItem(STORAGE_KEY_SECRET);
+                localStorage.removeItem(STORAGE_KEY_WEBHOOK);
+                localStorage.removeItem(STORAGE_KEY_CHANNEL);
+
+                secretKey = '';
+                registeredEmail = '';
+                discordWebhookUrl = '';
+                discordChannelId = '';
+
+                // 인풋 클리어
+                document.getElementById('admin-email').value = '';
+                document.getElementById('admin-pw').value = '';
+                document.getElementById('terms-check').checked = false;
+                document.getElementById('otp-code').value = '';
+                document.getElementById('lock-otp-code').value = '';
+                document.getElementById('webhook-url-input').value = '';
+                document.getElementById('discord-channel-id').value = '';
+
+                updateWebhookBadge(false);
+                updateChannelBadge(false);
+
+                // 레이아웃 변경
+                stepDashboard.classList.add('hidden');
+                stepLockscreen.classList.add('hidden');
+                authContainer.classList.remove('hidden');
+                stepReg.classList.remove('hidden');
+                
+                showAlert('정보 초기화', '브라우저 기기 기억장치에 저장되어 있던 계정 정보가 안전하게 제거되었습니다.', true);
+            }
+        }
+
+        /**
+         * 수동 등록용 보안 비밀키 클립보드 복사 유틸
          */
         function copySecretKey() {
             const displayEl = document.getElementById('secret-key-display');
@@ -747,179 +1123,13 @@
                     }, 2000);
                 }
             } catch(err) {
-                console.warn('복사 실패', err);
+                console.warn('복사 실패:', err);
             }
             window.getSelection().removeAllRanges();
         }
 
-        // Initialize copy status style
+        // 복사 뱃지 초기 세팅
         document.getElementById('copy-status').style.display = 'none';
-
-        // ==========================================
-        // 🚀 신규 디스코드 웹훅(Webhook) 통제 모듈
-        // ==========================================
-
-        /**
-         * 웹훅 설정을 저장하는 함수
-         */
-        function saveWebhookSettings() {
-            const urlInput = document.getElementById('webhook-url-input').value.trim();
-            const badge = document.getElementById('webhook-badge');
-
-            if(!urlInput) {
-                showAlert('입력 오류', '디스코드 웹훅 URL을 입력해 주세요.');
-                return;
-            }
-
-            if(!urlInput.startsWith('https://discord.com/api/webhooks/')) {
-                showAlert('형식 오류', '올바른 디스코드 웹훅 주소 형식이 아닙니다.');
-                return;
-            }
-
-            discordWebhookUrl = urlInput;
-            
-            // 배지 상태 연동 활성화 상태로 변경
-            badge.className = "text-[10px] bg-emerald-950 text-emerald-400 px-2.5 py-0.5 rounded-full border border-emerald-800";
-            badge.textContent = "연동 완료";
-
-            showAlert('웹훅 설정 완료', '디스코드 웹훅 설정이 활성화되었습니다. 이제 실시간 부대 통신 로그가 전송됩니다.', true);
-
-            // 로그인 성공 로그 웹훅으로 전송
-            sendToWebhook({
-                embeds: [{
-                    title: "🔓 단천부대 행정망 로그인 성공",
-                    description: `**접속 계정:** \`${registeredEmail}\`\n**인증 상태:** \`MFA 2차 OTP 통과 (최고 등급)\`\n**로그인 시각:** ${new Date().toLocaleString('ko-KR')}`,
-                    color: 3447003, // Indigo
-                    footer: { text: "Nexus Game Admin Portal - Webhook Log" }
-                }]
-            });
-        }
-
-        /**
-         * 웹훅으로 전송하는 실재적 비동기 Fetch 통제 유틸리티
-         */
-        async function sendToWebhook(payload) {
-            if(!discordWebhookUrl) return false;
-
-            try {
-                const response = await fetch(discordWebhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                return response.ok;
-            } catch (err) {
-                console.error("웹훅 발송 실패", err);
-                return false;
-            }
-        }
-
-        /**
-         * 웹훅 연동 테스트 메시지 발송 함수
-         */
-        async function testWebhook() {
-            if(!discordWebhookUrl) {
-                showAlert('설정 필요', '웹훅 설정을 먼저 저장하고 활성화해 주세요.');
-                return;
-            }
-
-            const success = await sendToWebhook({
-                content: `🔔 **[단천부대 행정망 연동 테스트]** 디스코드 웹훅과의 통신이 성공적으로 연결되었습니다!`
-            });
-
-            if(success) {
-                showAlert('테스트 발송 성공', '디스코드 채널로 연동 테스트 알림을 즉시 발송했습니다.', true);
-            } else {
-                showAlert('발송 실패', '웹훅 URL이 올바르지 않거나 디스코드 서버 문제로 인해 전송되지 않았습니다.');
-            }
-        }
-
-        /**
-         * 전체 공지 발송 (웹훅 연동 완료)
-         */
-        async function sendDiscordNotice() {
-            const text = document.getElementById('notice-text').value;
-            if(!text.trim()) {
-                showAlert('입력 오류', '공지사항 내용을 먼저 입력해 주세요.');
-                return;
-            }
-
-            if(!discordWebhookUrl) {
-                showAlert('연동 오류', '디스코드 웹훅 설정이 되어있지 않습니다. 상단에서 웹훅 URL을 입력한 후 진행해 주세요.');
-                return;
-            }
-
-            const success = await sendToWebhook({
-                embeds: [{
-                    title: "📢 단천부대 행정망 전체 공지사항",
-                    description: text,
-                    color: 15844367, // Yellow
-                    timestamp: new Date().toISOString(),
-                    footer: { text: "발신자: 통합 행정 대시보드" }
-                }]
-            });
-
-            if(success) {
-                showAlert('공지 발송 성공', '디스코드 웹훅 채널로 공지 임베드가 성공적으로 전송되었습니다.', true);
-                document.getElementById('notice-text').value = '';
-            } else {
-                showAlert('전송 오류', '웹훅 발송 도중 오류가 발생했습니다. 주소를 다시 한번 확인해 주세요.');
-            }
-        }
-
-        /**
-         * 유저 인증 승인 / 거절 관리 및 디스코드 웹훅 보고
-         */
-        async function manageAuth(action) {
-            let messageText = '';
-            let color = 0;
-            
-            if(action === 'approve') {
-                messageText = "✅ **[승인 보고]** `신입부대원_123` 님의 부대 역할(Role) 부여 요청이 행정관에 의해 정상 **승인** 처리되었습니다.";
-                color = 3066993; // Emerald
-                showAlert('인증 승인 완료', '해당 유저에게 디스코드 정식 부대원 역할(Role)이 부여되었으며 웹훅 보고가 전송되었습니다.', true);
-            } else {
-                messageText = "❌ **[반려 보고]** `신입부대원_123` 님의 인증 요청이 행정관에 의해 **반려** 및 메시지 취소 처리되었습니다.";
-                color = 15158332; // Red
-                showAlert('인증 거절 처리', '해당 유저의 인증 요청이 반려되었으며 웹훅 보고가 전송되었습니다.');
-            }
-
-            if(discordWebhookUrl) {
-                sendToWebhook({
-                    embeds: [{
-                        description: messageText,
-                        color: color,
-                        footer: { text: "행정관 처리 로그" }
-                    }]
-                });
-            }
-        }
-
-        /**
-         * 블랙리스트 강제 차단 및 디스코드 알림 발송
-         */
-        async function addBlacklist() {
-            const userId = document.getElementById('blacklist-user').value.trim();
-            if(!userId) {
-                showAlert('입력 오류', '차단할 유저 ID 혹은 닉네임을 정확히 입력해 주세요.');
-                return;
-            }
-
-            showAlert('블랙리스트 차단 성공', `[${userId}] 유저가 부대 행정 서버에서 추방 및 차단 조치되었습니다.`, true);
-            
-            if(discordWebhookUrl) {
-                sendToWebhook({
-                    embeds: [{
-                        title: "🚫 블랙리스트 조치 보고",
-                        description: `**차단 대상 유저:** \`${userId}\`\n**사유:** 행정망 보안 지침 위반 및 임의 접속 시도 차단\n**조치 시각:** ${new Date().toLocaleString('ko-KR')}`,
-                        color: 15158332, // Red
-                        footer: { text: "통제 행정망 차단 로그" }
-                    }]
-                });
-            }
-
-            document.getElementById('blacklist-user').value = '';
-        }
     </script>
 </body>
 </html>
