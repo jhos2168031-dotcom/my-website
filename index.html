@@ -777,7 +777,7 @@
                     switchTab('auth');
                     showAlert('잠금 해제 완료', '통합 행정 콘솔 권한이 인가되었습니다.', true);
                 } else {
-                    showAlert('검증 실패', '시간 지연 등으로 임시 코드가 맞지 않습니다. 스마트폰 앱의 번호를 다시 입력해 주십시오.');
+                    showAlert('검증 실패', '시간 지연 등으로 임시 코드가 맞지 않습니다. OTP 앱에 생성된 6자리 숫자를 다시 확인해 주십시오.');
                 }
             } catch(err) {
                 console.error(err);
@@ -909,15 +909,8 @@
             const feed = document.getElementById('discord-chat-feed');
             feed.innerHTML = '';
 
-            const initMessages = [
-                { user: "신입부대원_123", avatar: "신", color: "text-sky-400", time: "오후 10:11", text: "가입 승인 대기중입니다! 잘 부탁드립니다." },
-                { user: "Dancheon_Guard", avatar: "G", color: "text-emerald-400", time: "오후 10:15", text: "[알림] 신규 기기 접속 로그 확인: 검증 대기 리포트 송신됨." },
-                { user: "부대원_갑동", avatar: "갑", color: "text-indigo-400", time: "오후 10:19", text: "정기 부대 활동 회의 일정 공지사항 어디서 보나요?" }
-            ];
-
-            initMessages.forEach(msg => {
-                appendChatMessage(msg.user, msg.avatar, msg.color, msg.time, msg.text);
-            });
+            // 시스템 알림 메시지 한 줄만 깔끔하게 등록
+            appendSystemMessage(`[SYSTEM] 채널 ID ${discordChannelId} 모니터링 연결이 시작되었습니다.`);
 
             if(!isAuto) {
                 showAlert('채널 연동 완료', `채널 ID ${discordChannelId}와 관리자 포탈 피드가 매칭되었습니다.`, true);
@@ -942,6 +935,18 @@
                     <p class="text-[#dbdee1] mt-0.5">${text}</p>
                 </div>
             `;
+            feed.appendChild(msgRow);
+            feed.scrollTop = feed.scrollHeight;
+        }
+
+        /**
+         * 시스템 안전 상태/연결 알림 메시지 삽입 모듈
+         */
+        function appendSystemMessage(text) {
+            const feed = document.getElementById('discord-chat-feed');
+            const msgRow = document.createElement('div');
+            msgRow.className = "text-center text-[11px] text-emerald-400/80 font-rounded py-2 border-y border-[#2e3035]/50 bg-[#2b2d31]/30 my-2 rounded-lg";
+            msgRow.innerHTML = `<i class="fa-solid fa-circle-info mr-1"></i> ${text}`;
             feed.appendChild(msgRow);
             feed.scrollTop = feed.scrollHeight;
         }
